@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Text;
+using System.Linq;
 using FindstrUI.Core;
 using FindstrUI.WPF.Util;
 
@@ -9,15 +10,28 @@ namespace FindstrUI.WPF.ViewModels
 {
     class MainWindowViewModel : NotifyPropertyChanged
     {
-        public string CommandResult 
-        { 
+        public MainWindowViewModel()
+        {
+            CommandResult = new ObservableCollection<string>();
+        }
+
+        public ObservableCollection<string> CommandResult
+        {
             get => _commandResult;
             set
             {
-                if (_commandResult == value)
-                    return;
-
                 _commandResult = value;
+                OnPropertyChanged();
+            }
+        }
+        public int? Hits
+        {
+            get => _hits;
+            set
+            {
+                if (_hits == value)
+                    return; // Value is not changed.
+                _hits = value;
                 OnPropertyChanged();
             }
         }
@@ -27,18 +41,36 @@ namespace FindstrUI.WPF.ViewModels
         {
             if (string.IsNullOrEmpty(SearchString))
             {
-                CommandResult = "The search string cannot be empty.";
+                CommandResult = new ObservableCollection<string> { "The search string cannot be empty." };
+                UpdateHits(false);
                 return;
             }
 
-            CommandResult = "Wait for result...";
+            CommandResult = new ObservableCollection<string> { "Wait for result..." };
 
             var worker = new BackgroundWorker();
-            worker.DoWork += (object sender, DoWorkEventArgs e) => { e.Result = TerminalCommand.GetResult((string)e.Argument); };
-            worker.RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) => { CommandResult = (string)e.Result; };
+            worker.DoWork += (object sender, DoWorkEventArgs e) =>
+            {
+                var strResult = TerminalCommand.GetResult((string)e.Argument);
+                var lines = strResult.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+                e.Result = lines.ToList();
+            };
+
+            worker.RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) =>
+            {
+                CommandResult = new ObservableCollection<string>(e.Result as List<string>);
+                UpdateHits(true);
+            };
+
             worker.RunWorkerAsync(@$"findstr /p /i /n ""{SearchString}"" ""E:\Share\sm_reports\*""");
         }
 
-        private string _commandResult;
+        private void UpdateHits(bool hasResult)
+        {
+            Hits = hasResult ? CommandResult?.Count() : null;
+        }
+
+        private ObservableCollection<string> _commandResult;
+        private int? _hits;
     }
 }

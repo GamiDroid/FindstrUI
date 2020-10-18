@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FindstrUI.WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="FindstrUI" Height="450" Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200" />
@@ -19,7 +19,17 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TextBox Grid.Column="1" Text="{Binding SearchString}" />
-        <Button Grid.Column="1" Grid.Row="1" Click="Button_Click">Click me!</Button>
-        <TextBlock Grid.Row="2" Grid.ColumnSpan="4" Text="{Binding CommandResult}" />
+        <Button Grid.Column="1" Grid.Row="1" Click="Button_Click">Find</Button>
+        <StackPanel Grid.Column="2" Orientation="Horizontal">
+            <TextBlock >Hits: </TextBlock>
+            <TextBlock Text="{Binding ResultCount}"/>
+        </StackPanel>
+        <ListBox Grid.Row="2" Grid.ColumnSpan="4" ItemsSource="{Binding CommandResult}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
     </Grid>
 </Window>
