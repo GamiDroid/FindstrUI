@@ -40,5 +40,27 @@ namespace FindstrUI.WPF
         {
             _viewModel.Browse();
         }
+
+        private void OpenMsDocsFindstrMnu_Click(object sender, RoutedEventArgs e)
+        {
+            var url = @"https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/findstr";
+            try
+            {
+                System.Diagnostics.Process.Start(url);
+            }
+            catch
+            {
+                // hack because of this: https://github.com/dotnet/corefx/issues/10361
+                if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+                {
+                    url = url.Replace("&", "^&");
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
     }
 }

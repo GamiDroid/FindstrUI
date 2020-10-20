@@ -6,31 +6,41 @@
         xmlns:local="clr-namespace:FindstrUI.WPF"
         mc:Ignorable="d"
         Title="FindstrUI" Height="450" Width="800">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" />
-            <ColumnDefinition Width="200" />
-            <ColumnDefinition Width="200" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="100" />
-            <RowDefinition Height="100" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <Button Click="BrowseBtn_Click">Browse</Button>
-        <TextBox Grid.Column="1" Text="{Binding SearchString}" />
-        <Button Grid.Column="1" Grid.Row="1" Click="Button_Click">Find</Button>
-        <StackPanel Grid.Column="2" Orientation="Horizontal">
-            <TextBlock >Hits: </TextBlock>
-            <TextBlock Text="{Binding Hits}"/>
-        </StackPanel>
-        <ListBox Grid.Row="2" Grid.ColumnSpan="4" ItemsSource="{Binding CommandResult}">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding}" />
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-    </Grid>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_Help">
+                <MenuItem Header="findstr | Microsoft Docs" Click="OpenMsDocsFindstrMnu_Click" />
+            </MenuItem>
+        </Menu>
+        <StatusBar DockPanel.Dock="Bottom">
+            <TextBlock>This is the status bar</TextBlock>
+        </StatusBar>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="100" />
+                <RowDefinition Height="100" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Button Click="BrowseBtn_Click">Browse</Button>
+            <TextBox Grid.Column="1" Text="{Binding SearchString}" />
+            <Button Grid.Column="1" Grid.Row="1" Click="Button_Click">Find</Button>
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <TextBlock >Hits:</TextBlock>
+                <TextBlock Text="{Binding Hits}"/>
+            </StackPanel>
+            <ListBox Grid.Row="2" Grid.ColumnSpan="4" ItemsSource="{Binding CommandResult}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+    </DockPanel>
 </Window>
