@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Forms;
 using FindstrUI.Core;
 using FindstrUI.WPF.Util;
 
@@ -10,17 +11,31 @@ namespace FindstrUI.WPF.ViewModels
 {
     class MainWindowViewModel : NotifyPropertyChanged
     {
+        #region Constructor
         public MainWindowViewModel()
         {
             CommandResult = new ObservableCollection<string>();
-        }
+        } 
+        #endregion
 
+        #region Properties
         public ObservableCollection<string> CommandResult
         {
             get => _commandResult;
             set
             {
                 _commandResult = value;
+                OnPropertyChanged();
+            }
+        }
+        public string FolderSelection
+        {
+            get => _folderSelection;
+            set
+            {
+                if (_folderSelection == value)
+                    return; // Value is not changed.
+                _folderSelection = value;
                 OnPropertyChanged();
             }
         }
@@ -35,13 +50,23 @@ namespace FindstrUI.WPF.ViewModels
                 OnPropertyChanged();
             }
         }
-        public string SearchString { get; set; }
+        public string SearchString { get; set; } 
+        #endregion
 
         public void ExecuteCommand()
         {
+            if (string.IsNullOrEmpty(FolderSelection))
+            {
+                MessageBox.Show("There must be a folder selected.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                CommandResult = new ObservableCollection<string>();
+                UpdateHits(false);
+                return;
+            }
+
             if (string.IsNullOrEmpty(SearchString))
             {
-                CommandResult = new ObservableCollection<string> { "The search string cannot be empty." };
+                MessageBox.Show("The search string cannot be empty.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                CommandResult = new ObservableCollection<string>();
                 UpdateHits(false);
                 return;
             }
@@ -62,7 +87,22 @@ namespace FindstrUI.WPF.ViewModels
                 UpdateHits(true);
             };
 
-            worker.RunWorkerAsync(@$"findstr /p /i /n ""{SearchString}"" ""E:\Share\sm_reports\*""");
+            string path = FolderSelection + "\\*";
+
+            worker.RunWorkerAsync(@$"findstr /i /n ""{SearchString}"" ""{path}""");
+        }
+
+        public void Browse()
+        {
+            var dlg = new FolderBrowserDialog
+            {
+                ShowNewFolderButton = false,
+            };
+
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                FolderSelection = dlg.SelectedPath;
+            }
         }
 
         private void UpdateHits(bool hasResult)
@@ -70,7 +110,10 @@ namespace FindstrUI.WPF.ViewModels
             Hits = hasResult ? CommandResult?.Count() : null;
         }
 
+        #region Private fields
         private ObservableCollection<string> _commandResult;
-        private int? _hits;
+        private string _folderSelection;
+        private int? _hits; 
+        #endregion
     }
 }

@@ -35,5 +35,10 @@ namespace FindstrUI.WPF
         {
             _viewModel.ExecuteCommand();
         }
+
+        private void BrowseBtn_Click(object sender, RoutedEventArgs e)
+        {
+            _viewModel.Browse();
+        }
     }
 }
